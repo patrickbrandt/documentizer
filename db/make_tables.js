@@ -95,8 +95,8 @@ function loadData(tableName) {
   }
 
   requests.map((request) => {
-   doc.batchWrite({ RequestItems: request }).promise()
-    .then(_ => console.log(`items saved for ${tableName}`))
-    .catch(err => console.log(`error in batch write for ${tableName}: ${err}`));
+    doc.batchWrite({ RequestItems: request }).promise()
+      .then(_ => console.log(`items saved for ${tableName}`))
+      .catch(err => console.log(`error in batch write for ${tableName}: ${err}`));
   });
 }
