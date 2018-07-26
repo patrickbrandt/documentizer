@@ -6,3 +6,4 @@ const doc = aws.doc;
 // user doc --> name and articles
 // comment doc --> partition key is article id, sort key is date gsi is user id, 
 // article doc --> user id GSI, map type for article attribute includes user fields and first 10 comments
+
