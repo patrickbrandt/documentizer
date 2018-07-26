@@ -1,0 +1,18 @@
+version: '2'
+services:
+  dynamodb:
+    container_name: dynamodb-local
+    image: modli/dynamodb
+    expose:
+      - "8000"
+  init:
+    image: node:latest
+    container_name: init-local
+    environment:
+      - DYNAMODB_ENDPOINT=http://dynamodb:8000
+    volumes:
+      - ./db:/db
+    links:
+      - dynamodb
+    working_dir: /db
+    command: /bin/bash init.sh
