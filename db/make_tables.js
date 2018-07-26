@@ -23,7 +23,7 @@ fs.readdir(schemaDirectory, (err, items) => {
 
 function makeTable(item){
     const table = item.split('.')[0];
-    console.log('making table ' + table);
+    console.log(`making table ${table}`);
     deleteTable(table)
         .then(createTable)
         .then(loadData)
@@ -34,7 +34,7 @@ function deleteTable(tableName) {
     return new Promise((resolve, reject) => {
         dynamodb.deleteTable({ TableName: tableName }, (err, data) => {
             if (err && err.code === 'ResourceNotFoundException') {
-                console.log('WARN: can\'t delete ' + tableName + ' table because it does not exist');
+                console.log(`WARN: can't delete ${tableName} table because it does not exist`);
             } else if (err) {
                 return reject(err);
             }
@@ -54,7 +54,7 @@ function createTable(tableName) {
     return new Promise((resolve, reject) => {
         let params;
         try {
-            params = require(schemaDirectory + tableName + '.json');
+            params = JSON.parse(fs.readFileSync(`${schemaDirectory}${tableName}.json`));
         } catch (err) {
             return reject(err);
         }
@@ -68,7 +68,7 @@ function createTable(tableName) {
                 if (err) {
                     return reject(err);
                 } else {
-                    console.log('table created: ' + tableName);
+                    console.log(`table created: ${tableName}`);
                     return resolve(tableName);
                 }
             });
@@ -80,7 +80,7 @@ function loadData(tableName) {
     let items;
     try {
         console.log(`loading data for ${tableName}`);
-        items = JSON.parse(fs.readFileSync(sampleDataDirectory + tableName + '.json'));
+        items = JSON.parse(fs.readFileSync(`${sampleDataDirectory}${tableName}.json`));
     } catch (err) {
         console.log(err);
         return;
@@ -112,9 +112,9 @@ function loadData(tableName) {
     requests.map((request) => {
         doc.batchWrite({ RequestItems: request }, (err, data) => {
             if (err) {
-                console.log('error in batch write for ' + tableName + ': ' + err);
+                console.log(`error in batch write for ${tableName}: ${err}`);
             } else {
-                console.log('items saved for ' + tableName);
+                console.log(`items saved for ${tableName}`);
             }
         });
     });
