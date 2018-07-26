@@ -25,7 +25,7 @@ function makeTable(item){
   deleteTable(table)
     .then(createTable)
     .then(loadData)
-    .catch(function(err) { console.log(err.stack); });
+    .catch(err => console.log(err.stack));
 }
 
 function deleteTable(tableName) {
