@@ -6,7 +6,7 @@ services:
     expose:
       - "8000"
   init:
-    image: node:latest
+    image: node:8
     container_name: init-local
     environment:
       - DYNAMODB_ENDPOINT=http://dynamodb:8000
@@ -20,8 +20,12 @@ services:
   documentize:
     image: node:8
     container_name: documentize
+    environment:
+      - DYNAMODB_ENDPOINT=http://dynamodb:8000
     volumes:
       - ./documentize:/doc
       - ./shared:/shared
+    links:
+      - dynamodb
     working_dir: /doc
     command: /bin/bash run.sh
