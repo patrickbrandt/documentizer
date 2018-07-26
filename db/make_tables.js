@@ -1,5 +1,6 @@
 const aws = require('aws-sdk');
 const fs = require('fs');
+const {promisify} = require('util');
 
 aws.config.update({
   accessKeyId: process.env.ACCESS_KEY || 'Temp',
@@ -12,14 +13,11 @@ const schemaDirectory = process.env.SCHEMA_LOCATION || './tables/';
 const sampleDataDirectory = process.env.DATA_LOCATION || './data/';
 const dynamodb = new aws.DynamoDB();
 const doc = new aws.DynamoDB.DocumentClient();
+const readdirAsync = promisify(fs.readdir);
 
-fs.readdir(schemaDirectory, (err, items) => {
-  if (err) {
-    console.log(err);
-  } else {
-    items.map(makeTable);
-  }
-});
+readdirAsync(schemaDirectory)
+  .then(items => items.map(makeTable))
+  .catch(err => console.log(err));
 
 function makeTable(item){
   const table = item.split('.')[0];
