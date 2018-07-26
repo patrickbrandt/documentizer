@@ -1,0 +1,1 @@
+npm prune . && npm install . && npm run documentize
