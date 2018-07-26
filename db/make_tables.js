@@ -59,9 +59,7 @@ function createTable(tableName) {
       .then(_ => {
         return dynamodb.waitFor('tableExists', { TableName: tableName }).promise();
       })
-      .then(_ => {
-        resolve(tableName);
-      })
+      .then(_ => resolve(tableName))
       .catch(err => reject(err));
   });
 }
@@ -99,12 +97,8 @@ function loadData(tableName) {
   }
 
   requests.map((request) => {
-    doc.batchWrite({ RequestItems: request }, (err, data) => {
-      if (err) {
-        console.log(`error in batch write for ${tableName}: ${err}`);
-      } else {
-        console.log(`items saved for ${tableName}`);
-      }
-    });
+   doc.batchWrite({ RequestItems: request }).promise()
+    .then(_ => console.log(`items saved for ${tableName}`))
+    .catch(err => console.log(`error in batch write for ${tableName}: ${err}`));
   });
 }
