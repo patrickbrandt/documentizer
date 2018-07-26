@@ -1,8 +1,8 @@
 [
-  { "id": 1, "comment": "this is great" },
-  { "id": 2, "comment": "this is not great" },
-  { "id": 3, "comment": "this is tubular" },
-  { "id": 4, "comment": "I love this" },
-  { "id": 5, "comment": "free fun!" },
-  { "id": 6, "comment": "please send me money" }
+  { "id": 1, "comment": "this is great", "articleId": 4, "userId": 1 },
+  { "id": 2, "comment": "this is not great", "articleId": 4, "userId": 6 },
+  { "id": 3, "comment": "this is tubular", "articleId": 2, "userId": 1 },
+  { "id": 4, "comment": "I love this", "articleId": 10, "userId": 4 },
+  { "id": 5, "comment": "free fun!", "articleId": 1, "userId": 3 },
+  { "id": 6, "comment": "please send me money", "articleId": 5, "userId": 10 }
 ]

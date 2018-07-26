@@ -1,8 +1,0 @@
-[
-  { "id": "1", "userId": 1, "commentId": 6 },
-  { "id": "2", "userId": 1, "commentId": 5 },
-  { "id": "3", "userId": 2, "commentId": 4 },
-  { "id": "4", "userId": 10, "commentId": 3 },
-  { "id": "5", "userId": 8, "commentId": 2 },
-  { "id": "6", "userId": 1, "commentId": 1 }
-]
