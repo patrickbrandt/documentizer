@@ -3,7 +3,49 @@
     {
       "AttributeName": "id",
       "AttributeType": "N"
+    },
+    {
+      "AttributeName": "userId",
+      "AttributeType": "N"
+    },
+    {
+      "AttributeName": "articleId",
+      "AttributeType": "N"
     }
+  ],
+  "GlobalSecondaryIndexes": [
+      {
+          "IndexName": "userId-index",
+          "Projection": {
+              "ProjectionType": "ALL"
+          },
+          "ProvisionedThroughput": {
+              "WriteCapacityUnits": 5,
+              "ReadCapacityUnits": 5
+          },
+          "KeySchema": [
+              {
+                  "KeyType": "HASH",
+                  "AttributeName": "userId"
+              }
+          ]
+      },
+      {
+          "IndexName": "articleId-index",
+          "Projection": {
+              "ProjectionType": "ALL"
+          },
+          "ProvisionedThroughput": {
+              "WriteCapacityUnits": 5,
+              "ReadCapacityUnits": 5
+          },
+          "KeySchema": [
+              {
+                  "KeyType": "HASH",
+                  "AttributeName": "articleId"
+              }
+          ]
+      }
   ],
   "ProvisionedThroughput": {
     "WriteCapacityUnits": 5,

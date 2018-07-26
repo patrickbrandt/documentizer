@@ -1,8 +1,8 @@
 [
-  { "id": 1, "comment": "this is great", "articleId": 4, "userId": 1 },
-  { "id": 2, "comment": "this is not great", "articleId": 4, "userId": 6 },
-  { "id": 3, "comment": "this is tubular", "articleId": 2, "userId": 1 },
-  { "id": 4, "comment": "I love this", "articleId": 10, "userId": 4 },
-  { "id": 5, "comment": "free fun!", "articleId": 1, "userId": 3 },
-  { "id": 6, "comment": "please send me money", "articleId": 5, "userId": 10 }
+  { "id": 1, "date": "2011-10-05T14:48:00.000Z", "comment": "this is great", "articleId": 4, "userId": 1 },
+  { "id": 2, "date": "2013-10-05T14:48:00.000Z", "comment": "this is not great", "articleId": 4, "userId": 6 },
+  { "id": 3, "date": "2011-07-05T14:48:00.000Z", "comment": "this is tubular", "articleId": 2, "userId": 1 },
+  { "id": 4, "date": "2011-10-05T14:48:00.000Z", "comment": "I love this", "articleId": 10, "userId": 4 },
+  { "id": 5, "date": "2009-05-30T14:48:00.000Z", "comment": "free fun!", "articleId": 1, "userId": 3 },
+  { "id": 6, "date": "2012-10-06T10:48:00.000Z", "comment": "please send me money", "articleId": 5, "userId": 10 }
 ]
