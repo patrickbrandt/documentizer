@@ -1,18 +1,12 @@
-const aws = require('aws-sdk');
 const fs = require('fs');
+const Aws = require('../shared/aws');
 const {promisify} = require('util');
-
-aws.config.update({
-  accessKeyId: process.env.ACCESS_KEY || 'Temp',
-  secretAccessKey: process.env.SECRET_KEY || 'Temp',
-  endpoint: process.env.DYNAMODB_ENDPOINT || 'http://192.168.99.100:8000',
-  region: process.env.AWS_REGION || 'us-east-1'
-});
+const aws = new Aws(process.env.DYNAMODB_ENDPOINT);
 
 const schemaDirectory = process.env.SCHEMA_LOCATION || './tables/';
 const sampleDataDirectory = process.env.DATA_LOCATION || './data/';
-const dynamodb = new aws.DynamoDB();
-const doc = new aws.DynamoDB.DocumentClient();
+const dynamodb = aws.dynamodb;
+const doc = aws.doc;
 const readdirAsync = promisify(fs.readdir);
 
 readdirAsync(schemaDirectory)

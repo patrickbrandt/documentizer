@@ -12,7 +12,16 @@ services:
       - DYNAMODB_ENDPOINT=http://dynamodb:8000
     volumes:
       - ./db:/db
+      - ./shared:/shared
     links:
       - dynamodb
     working_dir: /db
     command: /bin/bash init.sh
+  documentize:
+    image: node:8
+    container_name: documentize
+    volumes:
+      - ./documentize:/doc
+      - ./shared:/shared
+    working_dir: /doc
+    command: /bin/bash run.sh
