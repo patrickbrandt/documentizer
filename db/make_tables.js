@@ -87,7 +87,7 @@ function loadData(tableName) {
       copy[tableName] = requestItem[tableName].slice();
       requests.push(copy);
       requestItem[tableName] = [];
-    ß}
+    }
   });
 
   if (requestItem[tableName].length > 0) {
