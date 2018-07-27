@@ -23,9 +23,9 @@ services:
     environment:
       - DYNAMODB_ENDPOINT=http://dynamodb:8000
     volumes:
-      - ./documentize:/doc
+      - ./documentize:/documentize
       - ./shared:/shared
     links:
       - dynamodb
-    working_dir: /doc
+    working_dir: /documentize
     command: /bin/bash run.sh
