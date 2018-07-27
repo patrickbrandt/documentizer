@@ -7,24 +7,22 @@ const doc = aws.doc;
 // comment doc --> partition key is article id, sort key is date, gsi is user id 
 // article doc --> user id GSI, map type for article attribute includes user fields and first 10 comments
 
-doc.scan({ TableName: 'article' }).promise()
-  .then(data => {
-    data.Items.map(articleRow => {
-      documentizeArticle(articleRow)
-        .then(articleDoc => cleanupComments(articleDoc))
-        .then(articleDoc => {
-          //console.log(`article ${articleRow.id} documentized: ${JSON.stringify(articleDoc)}\r\n`);          
-          const params = {
-            TableName: 'articleDoc',
-            Item: articleDoc,
-          }
-          return doc.put(params).promise()
-        })
-        .then(data => console.log(`article saved ${JSON.stringify(data)}`))
-        .catch(err => console.log(err));
-    });
-  })
-  .catch(err => console.log(err));
+convertArticles();
+
+async function convertArticles() {
+  const articles = await doc.scan({ TableName: 'article' }).promise();
+  articles.Items.map(async articleRow => {
+    const articleDoc = await documentizeArticle(articleRow);
+    const cleanDoc = await cleanupComments(articleDoc);
+    //console.log(`article ${articleRow.id} documentized: ${JSON.stringify(cleanDoc)}\r\n`);          
+    const params = {
+      TableName: 'articleDoc',
+      Item: cleanDoc,
+    }
+    const data = await doc.put(params).promise();
+    console.log(`article saved ${JSON.stringify(data)}`);      
+  });  
+}
 
 function cleanupComments(articleDoc) {
   return new Promise((resolve, reject) => {
@@ -34,39 +32,36 @@ function cleanupComments(articleDoc) {
     let count = 0;
     const comments = Object.assign([], articleDoc.comments);
     articleDoc.comments = [];
-    comments.forEach((comment, index) => {
+    comments.forEach(async (comment, index) => {
       params = {
         TableName: 'user',
         Key: {
           id: comment.userId,
         },
       };
-      doc.get(params).promise()
-        .then(data => {
-          articleDoc.comments.push({
-            id: comment.id,
-            text: comment.text,
-            date: comment.date,
-            author: {
-              id: data.Item.id,
-              name: data.Item.name,
-            }
-          });
+      const data = await doc.get(params).promise();        
+      articleDoc.comments.push({
+        id: comment.id,
+        text: comment.text,
+        date: comment.date,
+        author: {
+          id: data.Item.id,
+          name: data.Item.name,
+        }
+      });
 
-          //TODO: level up on async/await and see if there's a more elegant solution than this
-          count++;
-          if(count === comments.length) {
-            resolve(articleDoc);              
-          }
-        })
-        .catch(err => reject(err));
+      //TODO: level up on async/await and see if there's a more elegant solution than this
+      count++;
+      if(count === comments.length) {
+        resolve(articleDoc); 
+      }        
     });
   });
 }
 
 function documentizeArticle(articleRow) {
   const articleDoc = Object.assign({}, articleRow);
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     let params = {
       TableName: 'user2article',
       IndexName: 'articleId-index',
@@ -75,35 +70,27 @@ function documentizeArticle(articleRow) {
         ':aId': articleRow.id,
       },
     };
-    doc.query(params).promise()
-      .then(data => {
-        const userId = data.Items[0].userId; //assuming just one author for now
-        params = {
-          TableName: 'user',
-          KeyConditionExpression: 'id = :id',
-          ExpressionAttributeValues: {
-            ':id': userId,
-          },
-        };
-        return doc.query(params).promise();
-      })
-      .then(data => {
-        articleDoc.authors = data.Items;
-        params = {
-          TableName: 'comment',
-          IndexName: 'articleId-index',
-          KeyConditionExpression: 'articleId = :aId',
-          ExpressionAttributeValues: {
-            ':aId': articleRow.id,
-          },
-        };
-        return doc.query(params).promise();
-      })
-      .then(data => {
-        articleDoc.comments = data.Items;
-        resolve(articleDoc);
-      })
-      .catch(err => reject(err))
+    const user2article = await doc.query(params).promise();
+    const userId = user2article.Items[0].userId; //assuming just one author for now
+    params = {
+      TableName: 'user',
+      KeyConditionExpression: 'id = :id',
+      ExpressionAttributeValues: {
+        ':id': userId,
+      },
+    };
+    const user = await doc.query(params).promise();
+    articleDoc.authors = user.Items;
+    params = {
+      TableName: 'comment',
+      IndexName: 'articleId-index',
+      KeyConditionExpression: 'articleId = :aId',
+      ExpressionAttributeValues: {
+        ':aId': articleRow.id,
+      },
+    };
+    const comment = await doc.query(params).promise();
+    articleDoc.comments = comment.Items;
+    resolve(articleDoc);
   });
-   
 }
