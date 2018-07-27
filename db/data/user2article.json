@@ -1,6 +1,6 @@
 [
   { "id": "1", "userId": 1, "articleId": 10 },
-  { "id": "2", "userId": 2, "articleId": 9 },
+  { "id": "2", "userId": 1, "articleId": 9 },
   { "id": "3", "userId": 3, "articleId": 8 },
   { "id": "4", "userId": 4, "articleId": 7 },
   { "id": "5", "userId": 5, "articleId": 6 },
