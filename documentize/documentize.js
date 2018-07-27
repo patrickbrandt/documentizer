@@ -23,9 +23,7 @@ async function convertArticles() {
     try {
       await doc.put(params).promise();
       console.log(`article id ${articleRow.id} saved`);  
-    } catch(e) {
-
-    }
+    } catch(e) { console.log(e); }
   });  
 }
 
