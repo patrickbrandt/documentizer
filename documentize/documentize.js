@@ -20,8 +20,8 @@ async function convertArticles() {
       TableName: 'articleDoc',
       Item: cleanDoc,
     }
-    const data = await doc.put(params).promise();
-    console.log(`article saved ${JSON.stringify(data)}`);      
+    await doc.put(params).promise();
+    console.log(`article id ${articleRow.id} saved`);      
   });  
 }
 
