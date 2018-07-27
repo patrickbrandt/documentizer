@@ -7,7 +7,8 @@ const doc = aws.doc;
 // comment doc --> partition key is article id, sort key is date, gsi is user id 
 // article doc --> user id GSI, map type for article attribute includes user fields and first 10 comments
 
-convertArticles();
+//handy error-hadnling article: https://javascript.info/async-await#error-handling
+convertArticles().catch(err => console.log(err));
 
 async function convertArticles() {
   const articles = await doc.scan({ TableName: 'article' }).promise();
