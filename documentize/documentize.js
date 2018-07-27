@@ -13,22 +13,27 @@ convertArticles().catch(err => console.log(err));
 async function convertArticles() {
   const articles = await doc.scan({ TableName: 'article' }).promise();
   articles.Items.map(async articleRow => {
-    const articleDoc = await documentizeArticle(articleRow);
-    const cleanDoc = await cleanupComments(articleDoc);
+    const articleItem = await documentizeArticle(articleRow);
+    const cleanDoc = await cleanupComments(articleItem);
     //console.log(`article ${articleRow.id} documentized: ${JSON.stringify(cleanDoc)}\r\n`);          
     const params = {
       TableName: 'articleDoc',
       Item: cleanDoc,
     }
-    await doc.put(params).promise();
-    console.log(`article id ${articleRow.id} saved`);      
+    try {
+      await doc.put(params).promise();
+      console.log(`article id ${articleRow.id} saved`);  
+    } catch(e) {
+
+    }
   });  
 }
 
-function cleanupComments(articleDoc) {
+function cleanupComments(articleItem) {
+  const articleDoc = articleItem.article;
   return new Promise((resolve, reject) => {
     if (articleDoc.comments.length === 0) {
-      return resolve(articleDoc);
+      return resolve(articleItem);
     }
     let count = 0;
     const comments = Object.assign([], articleDoc.comments);
@@ -54,7 +59,8 @@ function cleanupComments(articleDoc) {
       //TODO: level up on async/await and see if there's a more elegant solution than this
       count++;
       if(count === comments.length) {
-        resolve(articleDoc); 
+        articleItem.article = articleDoc;
+        resolve(articleItem); 
       }        
     });
   });
@@ -92,7 +98,11 @@ function documentizeArticle(articleRow) {
     };
     const comment = await doc.query(params).promise();
     articleDoc.comments = comment.Items;
-    articleDoc.userId = userId; // GSI for retrieving articles by author
-    resolve(articleDoc);
+    const articleItem = {
+      id: articleRow.id, // DynamoDB parition key
+      userId, // GSI for retrieving articles by author
+      article: articleDoc, //reqular attribute
+    }
+    resolve(articleItem);
   });
 }
