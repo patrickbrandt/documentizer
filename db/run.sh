@@ -1,3 +1,5 @@
+#! /bin/bash
+
 cd ../shared
 npm link
 cd ../db
