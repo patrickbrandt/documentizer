@@ -14,4 +14,4 @@ class Aws {
   }
 };
 
-module.exports = Aws;
+module.exports = {Aws};

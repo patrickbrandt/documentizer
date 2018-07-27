@@ -1,5 +1,5 @@
 const fs = require('fs');
-const Aws = require('../shared/aws');
+const {Aws} = require('../shared');
 const {promisify} = require('util');
 const aws = new Aws(process.env.DYNAMODB_ENDPOINT);
 

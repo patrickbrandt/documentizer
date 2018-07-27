@@ -1,4 +1,4 @@
-const Aws = require('../shared/aws');
+const {Aws} = require('../shared');
 const aws = new Aws(process.env.DYNAMODB_ENDPOINT);
 const doc = aws.doc;
 
