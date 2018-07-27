@@ -5,7 +5,7 @@ services:
     image: modli/dynamodb
     expose:
       - "8000"
-  init:
+  init: #docker-compose run --rm init
     image: node:8
     container_name: init-local
     environment:
@@ -16,8 +16,8 @@ services:
     links:
       - dynamodb
     working_dir: /db
-    command: /bin/bash init.sh
-  documentize:
+    command: /bin/bash run.sh
+  documentize: #docker-compose run --rm documentize
     image: node:8
     container_name: documentize
     environment:
