@@ -19,7 +19,7 @@ function pluckArticles(items) {
   const articles = [];
   items.map(item => {
     articles.push(item.article);
-  })
+  });
   return articles;
 }
 
@@ -52,9 +52,7 @@ server.get('/article/author/:id', async (req, res, next) => {
       ':uId': parseInt(req.params.id),
     },
   };
-
   const data = await doc.query(params).promise();
-  
   res.send(pluckArticles(data.Items));
   next();
 });

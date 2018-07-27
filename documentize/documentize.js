@@ -57,7 +57,6 @@ function cleanupComments(articleItem) {
       //TODO: level up on async/await and see if there's a more elegant solution than this
       count++;
       if(count === comments.length) {
-        articleItem.article = articleDoc;
         resolve(articleItem); 
       }        
     });
