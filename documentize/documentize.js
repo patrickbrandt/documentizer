@@ -92,6 +92,7 @@ function documentizeArticle(articleRow) {
     };
     const comment = await doc.query(params).promise();
     articleDoc.comments = comment.Items;
+    articleDoc.userId = userId; // GSI for retrieving articles by author
     resolve(articleDoc);
   });
 }
