@@ -29,3 +29,17 @@ services:
       - dynamodb
     working_dir: /documentize
     command: /bin/bash run.sh
+  api: #docker-compose up api
+    image: node:8
+    ports:
+      - "8080:8080"
+    container_name: documentize-api
+    environment:
+      - DYNAMODB_ENDPOINT=http://dynamodb:8000
+    volumes:
+      - ./api:/api
+      - ./shared:/shared
+    links:
+      - dynamodb
+    working_dir: /api
+    command: /bin/bash run.sh
