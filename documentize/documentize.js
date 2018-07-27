@@ -101,7 +101,7 @@ function documentizeArticle(articleRow) {
     const articleItem = {
       id: articleRow.id, // DynamoDB parition key
       userId, // GSI for retrieving articles by author
-      article: articleDoc, //reqular attribute
+      article: articleDoc, //regular attribute
     }
     resolve(articleItem);
   });
