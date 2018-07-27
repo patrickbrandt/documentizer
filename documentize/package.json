@@ -7,8 +7,5 @@
     "documentize": "node documentize.js"
   },
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "aws-sdk": "^2.281.1"
-  }
+  "license": "ISC"
 }
