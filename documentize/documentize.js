@@ -35,7 +35,7 @@ async function convertRecursive(article, limit) {
   if (!article.LastEvaluatedKey) return;
 
   const nextArticleRow = await doc.scan({ TableName: 'article', Limit: limit, ExclusiveStartKey: { id: article.LastEvaluatedKey.id }}).promise();
-  convertRecursive(nextArticleRow);
+  convertRecursive(nextArticleRow, limit);
 }
 
 function cleanupComments(articleItem) {
