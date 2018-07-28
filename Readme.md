@@ -1,5 +1,5 @@
 
-Reference architecure example:
+Reference architecture example:
 
 * Create relational tables for a blog: Article, User, Comment, User2Article
 * Reshape relational data into document data for API syndication
@@ -7,7 +7,7 @@ Reference architecure example:
 
 Usage:
 
-* Initalize the relational data structure: ```docker-compose run --rm init```
+* Initialize the relational data structure: ```docker-compose run --rm init```
 * Convert to documents: ```docker-compose run --rm documentize```
 * Start api: ```docker-compose up api```
   * accessible on the host via the docker host IP address: ```http://192.168.99.100:8080/```
