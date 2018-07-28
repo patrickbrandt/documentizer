@@ -11,20 +11,34 @@ const doc = aws.doc;
 convertArticles().catch(err => console.log(err));
 
 async function convertArticles() {
-  const articles = await doc.scan({ TableName: 'article' }).promise();
-  articles.Items.map(async articleRow => {
-    const articleItem = await documentizeArticle(articleRow);
-    const cleanDoc = await cleanupComments(articleItem);
-    //console.log(`article ${articleRow.id} documentized: ${JSON.stringify(cleanDoc)}\r\n`);          
-    const params = {
-      TableName: 'articleDoc',
-      Item: cleanDoc,
-    }
-    try {
-      await doc.put(params).promise();
-      console.log(`article id ${articleRow.id} saved`);  
-    } catch(e) { console.log(e); }
-  });  
+  const firstArticle = await doc.scan({ TableName: 'article', Limit: 1 }).promise();
+  convertRecursive(firstArticle);
+}
+
+async function convertRecursive(articleRow) {
+  if (!articleRow  || !articleRow.Items || articleRow.Items.length === 0) {
+    return;
+  }
+
+  const articleItem = await documentizeArticle(articleRow.Items[0]);
+  const cleanDoc = await cleanupComments(articleItem);
+  const params = {
+    TableName: 'articleDoc',
+    Item: cleanDoc,
+  }
+  try {
+    await doc.put(params).promise();
+    console.log(`article id ${articleRow.Items[0].id} saved`);  
+  } catch(e) { console.log(e); }
+
+  //this isn't working per https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Scan.html#Scan.Pagination
+  if (!articleRow.LastEvaluatedKey) {
+    console.log('true');
+    return;
+  }
+
+  const nextArticleRow = await doc.scan({ TableName: 'article', Limit: 1, ExclusiveStartKey: { id: articleRow.LastEvaluatedKey.id }}).promise();  
+  convertRecursive(nextArticleRow);
 }
 
 function cleanupComments(articleItem) {
