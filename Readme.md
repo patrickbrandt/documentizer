@@ -8,8 +8,8 @@ Usage:
 
 * Initalize the relational data structure: ```docker-compose run --rm init```
 * Convert to documents: ```docker-compose run --rm documentize```
-* start api: ```docker-compose up api```
-  * uses the docker host IP address: ```http://192.168.99.100:8080/```
+* Start api: ```docker-compose up api```
+  * accessible on the host via the docker host IP address: ```http://192.168.99.100:8080/```
 
 These three commands are run in sequence when you execute ```./run.sh```
 
