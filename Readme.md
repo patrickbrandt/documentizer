@@ -16,3 +16,10 @@ These three commands are run in sequence when you execute ```./run.sh```
 Dependancies:
 
 * [Docker](https://docs.docker.com/install/#supported-platforms)
+
+Sample API calls (IP address = default Docker host IP address):
+
+* http://192.168.99.100:8080/article/
+* http://192.168.99.100:8080/article/1
+* http://192.168.99.100:8080/article/author/4
+* http://192.168.99.100:8080/article/author/1
