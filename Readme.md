@@ -10,7 +10,7 @@ Usage:
 * Convert to documents: ```docker-compose run --rm documentize```
 * Run api: ```docker-compose up api```
 
-These three commands are run in sequence when you execute ```run.sh```
+These three commands are run in sequence when you execute ```./run.sh```
 
 Dependancies:
 
