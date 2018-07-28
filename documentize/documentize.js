@@ -28,7 +28,7 @@ async function convertRecursive(articleRow) {
   }
   try {
     await doc.put(params).promise();
-    console.log(`article id ${articleRow.Items[0].id} saved`);  
+    console.log(`article id ${articleRow.Items[0].id} documentized`);  
   } catch(e) { console.log(e); }
 
   //this isn't working per https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Scan.html#Scan.Pagination
