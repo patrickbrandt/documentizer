@@ -1,6 +1,7 @@
 
 Reference architecure example:
 
+* Create relational tables for a blog: Article, User, Comment, User2Article
 * Reshape relational data into document data
 * Index content into ElasticSearch for full-text search
 
