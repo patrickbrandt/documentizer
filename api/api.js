@@ -11,7 +11,7 @@ server.listen(8080, () => {
 });
 
 server.get('/', (req, res, next) => {
-  res.send({ hello: 'world' });
+  res.send({ foo: 'bar' });
   next();
 });
 
