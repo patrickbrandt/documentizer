@@ -23,14 +23,13 @@ function pluckArticles(items) {
   return articles;
 }
 
-server.get('/article', async (req, res, next) => {
-  const data = await doc.scan({ TableName: 'articleDoc' }).promise();
-  res.send(pluckArticles(data.Items));
-  next();
-});
+async function sendArticles(req, res, next) {
+  if(!req.params.id) {
+    const data = await doc.scan({ TableName: 'articleDoc' }).promise();
+    res.send(pluckArticles(data.Items));
+    return next();
+  }
 
-server.get('/article/:id', async (req, res, next) => {
-  //console.log(JSON.stringify(req));
   const params = {
     TableName: 'articleDoc',
     Key: {
@@ -40,7 +39,10 @@ server.get('/article/:id', async (req, res, next) => {
   const data = await doc.get(params).promise();  
   res.send(data.Item.article);
   next();
-});
+}
+
+server.get('/article', sendArticles);
+server.get('/article/:id', sendArticles);
 
 /* TODO: query by name as well: /article/author?name={name} */
 server.get('/article/author/:id', async (req, res, next) => {
