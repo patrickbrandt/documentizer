@@ -13,6 +13,8 @@ Usage:
 
 These three commands are run in sequence when you execute ```./run.sh```
 
+NOTE: review this issue to avoid problems updating the api service: https://github.com/patrickbrandt/documentizer/issues/3
+
 Dependancies:
 
 * [Docker](https://docs.docker.com/install/#supported-platforms)
