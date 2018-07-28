@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 docker-compose run --rm init
 docker-compose run --rm documentize
