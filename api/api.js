@@ -25,8 +25,8 @@ function pluckArticles(items) {
 
 async function sendArticles(req, res, next) {
   if(!req.params.id) {
-    const data = await doc.scan({ TableName: 'articleDoc', Limit: 1 }).promise();
-    res.send(data);
+    const data = await doc.scan({ TableName: 'articleDoc' }).promise();
+    res.send(pluckArticles(data.Items));
     return next();
   }
 
