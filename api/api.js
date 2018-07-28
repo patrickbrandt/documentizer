@@ -7,7 +7,7 @@ const dynamodb = aws.dynamodb;
 const doc = aws.doc;
 
 server.listen(8080, () => {
-  console.log('ready on %s', server.url);
+  console.log(`ready on ${server.url}`);
 });
 
 server.get('/', (req, res, next) => {
