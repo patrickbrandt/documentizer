@@ -1,17 +1,122 @@
-const aws = require('aws-sdk');
+const aws_sdk = require('aws-sdk');
 
 class Aws {
   constructor(endpoint = 'http://192.168.99.100:8000', region = 'us-east-1', accessKeyId = 'Temp', secretAccessKey = 'Temp') {
-    aws.config.update({
+    aws_sdk.config.update({
       accessKeyId,
       secretAccessKey,
       endpoint,
       region
     });
 
-    this.dynamodb = new aws.DynamoDB();
-    this.doc = new aws.DynamoDB.DocumentClient();
+    this.dynamodb = new aws_sdk.DynamoDB();
+    this.doc = new aws_sdk.DynamoDB.DocumentClient();
   }
 };
 
-module.exports = {Aws};
+class ArticleDocument {
+  constructor(aws) {
+    this.aws = aws;
+  }
+
+  get tableName() {
+    return 'article';
+  }
+
+  async convert(articleRow) {
+    const tableItem = await this.documentizeArticle(articleRow);
+    const cleanDoc = await this.cleanupComments(tableItem);
+    const params = {
+      TableName: 'articleDoc',
+      Item: cleanDoc,
+    }
+    try {
+      await this.aws.doc.put(params).promise();
+      console.log(`${this.tableName} id ${articleRow.id} documentized`);
+    } catch(e) { console.log(e); throw e; }
+  }
+
+  documentizeArticle(articleRow) {
+    const articleDoc = Object.assign({}, articleRow);
+    return new Promise(async (resolve, reject) => {
+      let params = {
+        TableName: 'user2article',
+        IndexName: 'articleId-index',
+        KeyConditionExpression: 'articleId = :aId',
+        ExpressionAttributeValues: {
+          ':aId': articleRow.id,
+        },
+      };
+      const user2article = await this.aws.doc.query(params).promise();
+      const userId = user2article.Items[0].userId; //assuming just one author for now
+      params = {
+        TableName: 'user',
+        KeyConditionExpression: 'id = :id',
+        ExpressionAttributeValues: {
+          ':id': userId,
+        },
+      };
+      const user = await this.aws.doc.query(params).promise();
+      articleDoc.authors = user.Items;
+      params = {
+        TableName: 'comment',
+        IndexName: 'articleId-index',
+        KeyConditionExpression: 'articleId = :aId',
+        ExpressionAttributeValues: {
+          ':aId': articleRow.id,
+        },
+      };
+      const comment = await this.aws.doc.query(params).promise();
+      articleDoc.comments = comment.Items;
+      const articleItem = {
+        id: articleRow.id, // DynamoDB parition key
+        userId, // GSI for retrieving articles by author
+        article: articleDoc, //regular attribute
+      }
+      resolve(articleItem);
+    });
+  }
+
+  cleanupComments(articleItem) {
+    const articleDoc = articleItem.article;
+    return new Promise((resolve, reject) => {
+      if (articleDoc.comments.length === 0) {
+        return resolve(articleItem);
+      }
+      let count = 0;
+      const comments = Object.assign([], articleDoc.comments);
+      articleDoc.comments = [];
+      comments.forEach(async (comment, index) => {
+        const params = {
+          TableName: 'user',
+          Key: {
+            id: comment.userId,
+          },
+        };
+        const data = await this.aws.doc.get(params).promise();
+        articleDoc.comments.push({
+          id: comment.id,
+          text: comment.text,
+          date: comment.date,
+          author: {
+            id: data.Item.id,
+            name: data.Item.name,
+          }
+        });
+
+        //TODO: level up on async/await and see if there's a more elegant solution than this
+        count++;
+        if(count === comments.length) {
+          resolve(articleItem);
+        }
+      });
+    });
+  }
+}
+
+module.exports = {
+  Aws,
+  strategy: {
+    article: ArticleDocument,
+  },
+};

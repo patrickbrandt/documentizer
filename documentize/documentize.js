@@ -1,4 +1,5 @@
 const {Aws} = require('../shared');
+const {strategy} = require('../shared');
 const aws = new Aws(process.env.DYNAMODB_ENDPOINT);
 const doc = aws.doc;
 
@@ -8,109 +9,22 @@ const doc = aws.doc;
 // TODO: comment doc --> partition key is article id, sort key is date, gsi is user id
 
 //handy async/await error-handling article: https://javascript.info/async-await#error-handling
-convertArticles().catch(err => console.log(err));
+convertTable('article').catch(err => console.log(err));
 
-async function convertArticles(limit = 1) {
-  const firstArticleScan = await doc.scan({ TableName: 'article', Limit: limit }).promise();
-  convertRecursive(firstArticleScan, limit);
+async function convertTable(tableName, limit = 1) {
+  const firstScan = await doc.scan({ TableName: tableName, Limit: limit }).promise();
+  convertTableRecursive(firstScan, tableName, limit);
 }
 
-// TODO: encapsulate documentize functions into strategy class
-
-async function convertRecursive(article, limit) {
-  article.Items.forEach(async (row, index) => {
-    const articleItem = await documentizeArticle(row);
-    const cleanDoc = await cleanupComments(articleItem);
-    const params = {
-      TableName: 'articleDoc',
-      Item: cleanDoc,
-    }
-    try {
-      await doc.put(params).promise();
-      console.log(`article id ${row.id} documentized`);
-    } catch(e) { console.log(e); }
+async function convertTableRecursive(rows, tableName, limit) {
+  rows.Items.forEach(async (row, index) => {
+    const documentizer = new strategy[tableName](aws);
+    await documentizer.convert(row);
   });
 
   // https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Scan.html#Scan.Pagination
-  if (!article.LastEvaluatedKey) return;
+  if (!rows.LastEvaluatedKey) return;
 
-  const nextArticleRow = await doc.scan({ TableName: 'article', Limit: limit, ExclusiveStartKey: { id: article.LastEvaluatedKey.id }}).promise();
-  convertRecursive(nextArticleRow, limit);
-}
-
-function cleanupComments(articleItem) {
-  const articleDoc = articleItem.article;
-  return new Promise((resolve, reject) => {
-    if (articleDoc.comments.length === 0) {
-      return resolve(articleItem);
-    }
-    let count = 0;
-    const comments = Object.assign([], articleDoc.comments);
-    articleDoc.comments = [];
-    comments.forEach(async (comment, index) => {
-      params = {
-        TableName: 'user',
-        Key: {
-          id: comment.userId,
-        },
-      };
-      const data = await doc.get(params).promise();
-      articleDoc.comments.push({
-        id: comment.id,
-        text: comment.text,
-        date: comment.date,
-        author: {
-          id: data.Item.id,
-          name: data.Item.name,
-        }
-      });
-
-      //TODO: level up on async/await and see if there's a more elegant solution than this
-      count++;
-      if(count === comments.length) {
-        resolve(articleItem);
-      }
-    });
-  });
-}
-
-function documentizeArticle(articleRow) {
-  const articleDoc = Object.assign({}, articleRow);
-  return new Promise(async (resolve, reject) => {
-    let params = {
-      TableName: 'user2article',
-      IndexName: 'articleId-index',
-      KeyConditionExpression: 'articleId = :aId',
-      ExpressionAttributeValues: {
-        ':aId': articleRow.id,
-      },
-    };
-    const user2article = await doc.query(params).promise();
-    const userId = user2article.Items[0].userId; //assuming just one author for now
-    params = {
-      TableName: 'user',
-      KeyConditionExpression: 'id = :id',
-      ExpressionAttributeValues: {
-        ':id': userId,
-      },
-    };
-    const user = await doc.query(params).promise();
-    articleDoc.authors = user.Items;
-    params = {
-      TableName: 'comment',
-      IndexName: 'articleId-index',
-      KeyConditionExpression: 'articleId = :aId',
-      ExpressionAttributeValues: {
-        ':aId': articleRow.id,
-      },
-    };
-    const comment = await doc.query(params).promise();
-    articleDoc.comments = comment.Items;
-    const articleItem = {
-      id: articleRow.id, // DynamoDB parition key
-      userId, // GSI for retrieving articles by author
-      article: articleDoc, //regular attribute
-    }
-    resolve(articleItem);
-  });
+  const nextRowSet = await doc.scan({ TableName: tableName, Limit: limit, ExclusiveStartKey: { id: rows.LastEvaluatedKey.id }}).promise();
+  convertTableRecursive(nextRowSet, tableName, limit);
 }
