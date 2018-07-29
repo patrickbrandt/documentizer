@@ -116,7 +116,7 @@ class ArticleDocument {
 
 module.exports = {
   Aws,
-  strategy: {
+  Strategy: {
     article: ArticleDocument,
   },
 };
