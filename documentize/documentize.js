@@ -12,8 +12,8 @@ const doc = aws.doc;
 convertTable('article').catch(err => console.log(err));
 
 async function convertTable(tableName, limit = 1) {
-  const firstScan = await doc.scan({ TableName: tableName, Limit: limit }).promise();
-  convertTableRecursive(firstScan, tableName, limit);
+  const firstRowSet = await doc.scan({ TableName: tableName, Limit: limit }).promise();
+  convertTableRecursive(firstRowSet, tableName, limit);
 }
 
 async function convertTableRecursive(rows, tableName, limit) {
