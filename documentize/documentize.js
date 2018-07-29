@@ -1,5 +1,5 @@
 const {Aws} = require('../shared');
-const {Strategy} = require('../shared');
+const {Documentizer} = require('../shared');
 const aws = new Aws(process.env.DYNAMODB_ENDPOINT);
 const doc = aws.doc;
 
@@ -18,7 +18,7 @@ async function convertTable(tableName, limit = 1) {
 
 async function convertTableRecursive(rows, tableName, limit) {
   rows.Items.forEach(async (row, index) => {
-    const documentizer = new Strategy[tableName](aws);
+    const documentizer = new Documentizer(tableName, aws);
     await documentizer.convert(row);
   });
 

@@ -114,9 +114,24 @@ class ArticleDocument {
   }
 }
 
+class Documentizer {
+  constructor(tableName, aws) {
+    this.aws = aws;
+    this.strategy = new this.strategies[tableName](aws);
+  }
+
+  async convert(row) {
+    await this.strategy.convert(row);
+  }
+
+  get strategies() {
+    return {
+      article: ArticleDocument,
+    }
+  }
+}
+
 module.exports = {
   Aws,
-  Strategy: {
-    article: ArticleDocument,
-  },
+  Documentizer,
 };
