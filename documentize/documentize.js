@@ -25,6 +25,6 @@ async function convertTableRecursive(rows, tableName, limit) {
   // https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Scan.html#Scan.Pagination
   if (!rows.LastEvaluatedKey) return;
 
-  const nextRowSet = await doc.scan({ TableName: tableName, Limit: limit, ExclusiveStartKey: { id: rows.LastEvaluatedKey.id }}).promise();
+  const nextRowSet = await doc.scan({ TableName: tableName, Limit: limit, ExclusiveStartKey: rows.LastEvaluatedKey }).promise();
   convertTableRecursive(nextRowSet, tableName, limit);
 }
