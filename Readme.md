@@ -19,6 +19,8 @@ NOTE: review this issue to avoid problems updating the api service: https://gith
 Dependancies:
 
 * [Docker](https://docs.docker.com/install/#supported-platforms)
+* JavaScript skills
+* DynamoDB awareness
 
 Sample API calls (IP address = default Docker host IP address):
 
