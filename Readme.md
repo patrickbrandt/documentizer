@@ -20,7 +20,7 @@ Dependancies:
 
 * [Docker](https://docs.docker.com/install/#supported-platforms)
 * JavaScript skills
-* DynamoDB awareness
+* DynamoDB skills
 
 Sample API calls (IP address = default Docker host IP address):
 
