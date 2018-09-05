@@ -79,14 +79,14 @@ class ArticleDocument {
 
   cleanupComments(articleItem) {
     const articleDoc = articleItem.article;
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (articleDoc.comments.length === 0) {
         return resolve(articleItem);
       }
       let count = 0;
       const comments = Object.assign([], articleDoc.comments);
       articleDoc.comments = [];
-      comments.forEach(async (comment, index) => {
+      for (const comment of comments) {
         const params = {
           TableName: 'user',
           Key: {
@@ -109,7 +109,7 @@ class ArticleDocument {
         if(count === comments.length) {
           resolve(articleItem);
         }
-      });
+      }
     });
   }
 }

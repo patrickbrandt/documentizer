@@ -36,16 +36,16 @@ async function sendArticles(req, res, next) {
       id: parseInt(req.params.id),
     },
   };
-  const data = await doc.get(params).promise();  
+  const data = await doc.get(params).promise();
   res.send(data.Item.article);
   next();
 }
 
-server.get('/article', sendArticles);
-server.get('/article/:id', sendArticles);
+server.get('/articles', sendArticles);
+server.get('/articles/:id', sendArticles);
 
 /* TODO: query by name as well: /article/author?name={name} */
-server.get('/article/author/:id', async (req, res, next) => {
+server.get('/articles/author/:id', async (req, res, next) => {
   let params = {
     TableName: 'articleDoc',
     IndexName: 'userId-index',

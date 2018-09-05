@@ -2,7 +2,7 @@ version: '2'
 services:
   dynamodb:
     container_name: dynamodb-local
-    image: modli/dynamodb
+    image: amazon/dynamodb-local
     expose:
       - "8000"
   init: #docker-compose run --rm init

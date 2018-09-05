@@ -17,10 +17,10 @@ async function convertTable(tableName, limit = 1) {
 }
 
 async function convertTableRecursive(rows, tableName, limit) {
-  rows.Items.forEach(async (row, index) => {
-    const documentizer = new Documentizer(tableName, aws);
+  const documentizer = new Documentizer(tableName, aws);
+  for (const row of rows.Items) {
     await documentizer.convert(row);
-  });
+  }
 
   // https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Scan.html#Scan.Pagination
   if (!rows.LastEvaluatedKey) return;
