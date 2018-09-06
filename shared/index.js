@@ -103,13 +103,8 @@ class ArticleDocument {
             name: data.Item.name,
           }
         });
-
-        //TODO: level up on async/await and see if there's a more elegant solution than this
-        count++;
-        if(count === comments.length) {
-          resolve(articleItem);
-        }
       }
+      resolve(articleItem);
     });
   }
 }
