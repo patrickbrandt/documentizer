@@ -1,7 +1,7 @@
 const aws_sdk = require('aws-sdk');
 
 class Aws {
-  constructor(endpoint = 'http://192.168.99.100:8000', region = 'us-east-1', accessKeyId = 'Temp', secretAccessKey = 'Temp') {
+  constructor(endpoint = 'http://dynamodb:8000', region = 'us-east-1', accessKeyId = 'Temp', secretAccessKey = 'Temp') {
     aws_sdk.config.update({
       accessKeyId,
       secretAccessKey,
