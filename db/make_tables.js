@@ -76,9 +76,7 @@ async function loadData(tableName) {
     });
 
     if (index % 25 === 0) {
-      const copy = Object.assign({}, requestItem);
-      copy[tableName] = requestItem[tableName].slice();
-      requests.push(copy);
+      requests.push(Object.assign({}, requestItem));
       requestItem[tableName] = [];
     }
   });
