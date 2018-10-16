@@ -10,7 +10,7 @@ Usage:
 * Initialize the relational data structure: ```docker-compose run --rm init```
 * Convert to documents: ```docker-compose run --rm documentize```
 * Start api: ```docker-compose up api```
-  * accessible on the host via the docker host IP address: ```http://192.168.99.100:8080/```
+  * accessible on the host via the docker host IP address: ```http://localhost:8080/```
 
 These three commands are run in sequence when you execute ```./run.sh```
 
@@ -24,7 +24,7 @@ Dependancies:
 
 Sample API calls (IP address = default Docker host IP address):
 
-* http://192.168.99.100:8080/article/
-* http://192.168.99.100:8080/article/1
-* http://192.168.99.100:8080/article/author/4
-* http://192.168.99.100:8080/article/author/1
+* http://localhost:8080/article/
+* http://localhost:8080/article/1
+* http://localhost:8080/article/author/4
+* http://localhost:8080/article/author/1

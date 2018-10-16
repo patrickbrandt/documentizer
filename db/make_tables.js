@@ -9,60 +9,59 @@ const dynamodb = aws.dynamodb;
 const doc = aws.doc;
 const readdirAsync = promisify(fs.readdir);
 
-readdirAsync(schemaDirectory)
-  .then(items => items.map(makeTable))
-  .catch(err => console.log(err));
+const run = async () => {
+  const items = await readdirAsync(schemaDirectory);
+  for (const item of items) {
+    await makeTable(item);
+  }
+};
 
-function makeTable(item){
+run();
+
+async function makeTable(item){
   const table = item.split('.')[0];
-  console.log(`making table ${table}`);
-  deleteTable(table)
-    .then(createTable)
-    .then(loadData)
-    .catch(err => console.log(err.stack));
+  try {
+    console.log(`making table ${table}`);
+    await deleteTable(table);
+    await createTable(table);
+    await loadData(table);
+  } catch (e) {
+    console.log(`error making table ${table}: ${e}`);
+  }
 }
 
-function deleteTable(tableName) {
-  return new Promise((resolve, reject) => {      
-    dynamodb.deleteTable({ TableName: tableName }, (err, data) => {
-      if (err && err.code === 'ResourceNotFoundException') {
-        console.log(`WARN: can't delete ${tableName} table because it does not exist`);
-      } else if (err) {
-        return reject(err);
-      }
-      
-      dynamodb.waitFor('tableNotExists', { TableName: tableName }).promise()
-        .then(_ => resolve(tableName))
-        .catch(err => reject(err))
-    });        
-  });
-}
-
-function createTable(tableName) {
-  return new Promise((resolve, reject) => {
-    let params;
-    try {
-      params = JSON.parse(fs.readFileSync(`${schemaDirectory}${tableName}.json`));
-    } catch (err) {
-      return reject(err);
+async function deleteTable(tableName) {
+  try {
+    await dynamodb.deleteTable({ TableName: tableName }).promise();
+    await dynamodb.waitFor('tableNotExists', { TableName: tableName }).promise()
+  } catch (e) {
+    if (e && e.code === 'ResourceNotFoundException') {
+      return console.log(`WARN: can't delete ${tableName} table because it does not exist`);
     }
-
-    dynamodb.createTable(params).promise()
-      .then(_ => {
-        return dynamodb.waitFor('tableExists', { TableName: tableName }).promise();
-      })
-      .then(_ => resolve(tableName))
-      .catch(err => reject(err));
-  });
+    throw e;
+  }
+  return tableName;    
 }
 
-function loadData(tableName) {
+async function createTable(tableName) {
+  try {
+    const params = JSON.parse(fs.readFileSync(`${schemaDirectory}${tableName}.json`));
+    await dynamodb.createTable(params).promise();
+    return tableName;
+
+  } catch (e) {
+    throw e;
+  }  
+}
+
+async function loadData(tableName) {
   let items;
   try {
     console.log(`loading data for ${tableName}`);
     items = JSON.parse(fs.readFileSync(`${sampleDataDirectory}${tableName}.json`));
-  } catch (err) {
-    return console.log(err);
+  } catch (e) {
+    console.log(e);
+    throw e;
   }
 
   const requestItem = {};
@@ -88,9 +87,8 @@ function loadData(tableName) {
     requests.push(requestItem);
   }
 
-  requests.map((request) => {
-    doc.batchWrite({ RequestItems: request }).promise()
-      .then(_ => console.log(`items saved for ${tableName}`))
-      .catch(err => console.log(`error in batch write for ${tableName}: ${err}`));
-  });
+  for (const request of requests) {
+    await doc.batchWrite({ RequestItems: request }).promise();
+    console.log(`items saved for ${tableName}`);
+  }
 }
